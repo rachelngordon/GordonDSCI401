@@ -12,13 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Question 2
 
 ```{r}
-cubs <- read.csv("https://raw.githubusercontent.com/
-gjm112/DSCI401/main/data/cubs_all_time.csv")
-```
-
-```{r}
-cubs <- read.csv("Desktop/DSCI401/data/cubs_all_time.csv")
-cubs
+cubs <- read.csv("/users/rachelgordon/Desktop/DSCI401/data/cubs_all_time.csv")
 ```
 
 
