@@ -1,2 +1,2 @@
 # GordonDSCI401
-Introduction to Data Science coursework
+Coursework for Introduction to Data Science
