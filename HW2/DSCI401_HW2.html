@@ -409,7 +409,7 @@ been hit?</p>
 # subtract year 1787, divide by 4, and round up
 pres_terms = c()
 for (y in teams$yearID) {
-  pres_terms &lt;- c(pres_terms, ceiling((y-1787)/4))
+  pres_terms &lt;- c(pres_terms, ceiling((y-1788)/4))
 }
 
 teams$pres_term &lt;- pres_terms
@@ -426,7 +426,7 @@ most_runs[most_runs$runs == max(most_runs$runs),]</code></pre>
 <pre><code>## # A tibble: 1 × 2
 ##   pres_term  runs
 ##       &lt;dbl&gt; &lt;int&gt;
-## 1        58 24076</code></pre>
+## 1        54 21175</code></pre>
 </div>
 <div id="part-d-10-points" class="section level2">
 <h2>part (d) (10 points)</h2>

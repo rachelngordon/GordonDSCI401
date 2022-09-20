@@ -48,7 +48,7 @@ Create a factor called election that divides the yearID into 4-year blocks that 
 # subtract year 1787, divide by 4, and round up
 pres_terms = c()
 for (y in teams$yearID) {
-  pres_terms <- c(pres_terms, ceiling((y-1787)/4))
+  pres_terms <- c(pres_terms, ceiling((y-1788)/4))
 }
 
 teams$pres_term <- pres_terms
