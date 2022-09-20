@@ -1,0 +1,228 @@
+---
+title: "DSCI401_HW2"
+output: html_document
+date: "2022-09-13"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Question 1
+
+Using the Teams data frame in the Lahman package:
+
+## part (a) (10 points) 
+
+Create a data frame that is a subset of the Teams data frame that contains only the years from 2000 through 2009 and the variables yearID, W, and L.
+
+```{r}
+teams <- read.csv("Teams.csv")
+sub_teams <- subset(teams[teams$yearID <= 2009 & teams$yearID >= 2000,], select = c("yearID", "W", "L"))
+```
+
+## part (b) (10points)
+
+How many years did the Chicago Cubs (team ID is “CHN”) hit at least 200 HRs in a season and what was the median number of wins in those seasons.
+
+```{r}
+cubs <- teams[teams$teamID == "CHN",]
+
+library(tidyverse)
+cubs_runs <- cubs %>%
+  group_by(yearID) %>%
+  summarize(runs = sum(HR), wins = W)
+
+high_runs <- cubs_runs[cubs_runs$runs >= 200,]
+dim(high_runs)[1]
+median(high_runs$wins)
+```
+
+
+## part (c) (10 points) 
+
+Create a factor called election that divides the yearID into 4-year blocks that correspond to U.S. presidential terms. The first presidential term started in 1788. They each last 4 years and are still on the schedule set in 1788. During which term have the most home runs been hit?
+
+```{r}
+# create a new column for presidential term
+# subtract year 1787, divide by 4, and round up
+pres_terms = c()
+for (y in teams$yearID) {
+  pres_terms <- c(pres_terms, ceiling((y-1787)/4))
+}
+
+teams$pres_term <- pres_terms
+
+# find total runs grouped by presidential term
+most_runs <- teams %>%
+  subset(select = c(pres_term, HR)) %>%
+  group_by(pres_term) %>%
+  summarize(runs = sum(HR))
+
+
+# find the presidential term with max home runs
+most_runs[most_runs$runs == max(most_runs$runs),]
+```
+
+
+## part (d) (10 points) 
+
+Make a line plot of total home runs per season and stratify by league. Remove observations where league is missing.
+
+```{r}
+# drop lgID NA's
+lg_teams <- 
+  teams[!is.na(teams$lgID),] %>%
+  group_by(lgID)
+
+# create line plot
+library(gcookbook)
+
+ggplot(lg_teams, aes(x = yearID, y = HR, colour = lgID)) +
+  geom_line()
+```
+
+## part (e) (10 points) 
+
+Create an indicator variable called “winning record” which is defined as TRUE if the number of wins is greater than the number of losses and FALSE otherwise. Plot a scatter plot of Runs (R) vs Runs against (RA) with the color of each point showing whether that team had a winning record or not.
+
+```{r}
+library(dplyr)
+
+# Adding winning record based on wins and losses
+teams <- teams %>%
+  mutate(winning_record = case_when(
+    W > L ~ TRUE,
+    W <= L ~ FALSE
+    ))
+
+# color selection
+colors <- c("#FDAE61", # Orange
+            "#D9EF8B") # Light green
+
+# Scatter plot
+plot(teams$RA, teams$R, pch = 19, col = colors[factor(teams$winning_record)], main = "Runs vs Runs Against by Winning Record", xlab = "Runs Against", ylab = "Runs")
+```
+
+
+# Question 2
+
+Use the nycflights13 package and the flights data frame to answer the following questions:
+
+## part (a) (10 points) 
+
+What month had the highest proportion of cancelled flights? What month had the lowest? Interpret any seasonal patterns.
+
+```{r}
+# import the data
+flights <- read.csv("https://raw.githubusercontent.com/gjm112/DSCI401/main/data/flights.csv")
+
+# Adding cancelled column based on when air time is NA
+flights <- flights %>%
+  mutate(cancelled = case_when(
+    is.na(air_time) == TRUE ~ 1,
+    is.na(air_time) == FALSE ~ 0
+    ))
+
+# find proportion cancellations per month
+month_cancels <- flights %>%
+  subset(select = c(month, cancelled)) %>%
+  group_by(month) %>%
+  summarize(cancellations = mean(cancelled))
+
+# find month with max proportion of cancellations
+month_cancels[month_cancels$cancellations == max(month_cancels$cancellations),]
+
+# find month with min proportion of cancellations
+month_cancels[month_cancels$cancellations == min(month_cancels$cancellations),]
+```
+
+The Winter months, such as February, have the most cancellations, while October has the least amount of cancellations, perhaps because it is in the Fall
+
+
+## part (b) (10 points) 
+
+Given that a delay is longer than an hour, what is the average time of the total delay by airport (i.e. origin)
+
+```{r}
+# subset for delays longer than an hour
+long_delays <- flights[flights$arr_delay > 60,]
+
+# average delay by airport
+avg_delays <- 
+  long_delays %>%
+  subset(select = c(origin, arr_delay)) %>%
+  group_by(origin) %>%
+  summarize(avg_delay = mean(arr_delay))
+  
+avg_delays
+```
+
+
+## part (c) (10 points) 
+
+What is the average air time for all flights by carrier? Which carrier has the longest average air time on their flights?
+
+```{r}
+# drop air_time NA's
+flights <- flights[!is.na(flights$air_time),]
+
+# average air time by carrier
+air_times <- flights %>%
+  subset(select = c(carrier, air_time)) %>%
+  group_by(carrier) %>%
+  summarize(avg_air_time = mean(air_time))
+
+air_times
+
+
+# carrier with longest average air time
+air_times[air_times$avg_air_time == max(air_times$avg_air_time),]
+```
+
+
+## part (d) (10 points) 
+
+Keeping only flights that had a delay greater than 0, create a histogram for each month of the delay data.
+
+```{r}
+# subset for delays greater than 0
+delays <- flights[flights$arr_delay > 0,]
+
+# create histogram by month
+library(ggplot2)
+ggplot(delays, aes(x=arr_delay, fill=factor(month), color=factor(month))) +
+geom_histogram(position="identity")
+```
+
+
+## part (e) (10 points) 
+
+Create side-by-side boxplots of delay times for flights with delays 60 minutes or greater for the top
+
+```{r}
+flight_counts <- table(long_delays$carrier)
+
+# create a dictionary with total flights for each airline
+top_airlines = c()
+for (c in unique(long_delays$carrier)) {
+  top_airlines[c] = flight_counts[c]
+}
+
+# sort the dictionary and extract top five airlines
+top_carriers <- sort(top_airlines, decreasing = TRUE)[1:5]
+
+
+# take subset of only top five airlines
+airlines <- long_delays[long_delays$carrier %in% names(top_carriers), ]
+
+# create boxplot grouped by airline
+boxplot(airlines$arr_delay ~ airlines$carrier,
+        col='steelblue',
+        main='Delay Times by Airline',
+        xlab='Airline',
+        ylab='Delay Time') 
+```
+
+Google Colab Notebook: https://colab.research.google.com/drive/1wRpB2C5tIDuGMFqAZYS3gjPRVlx1wFYv?usp=sharing
+

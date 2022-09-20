@@ -1,0 +1,72 @@
+---
+title: "DSCI401_HW1"
+output: html_document
+date: "2022-08-30"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Question 2
+
+```{r}
+cubs <- read.csv("/users/rachelgordon/Desktop/DSCI401/data/cubs_all_time.csv")
+```
+
+
+## part (a)
+
+How many total games have the Cubs won and lost between 1876
+and 2022?
+
+```{r}
+# games won
+sum(cubs['W'])
+
+# games lost
+sum(cubs['L'])
+```
+
+
+## part (b)
+
+What year did the Cubs score the most runs? What year did the Cubs score the fewest runs? Do you have any thoughts about the year that the Cubs scored the fewest runs?
+
+```{r}
+# year with most runs
+max_runs <- max(cubs['R'])
+cubs[cubs$R == max_runs,]['Year']
+
+# year with fewest runs
+min_runs <- min(cubs['R'])
+cubs[cubs$R == min_runs,]['Year']
+```
+
+2020 was a difficult year for everyone due to COVID so it makes sense that the Cubs scored the fewest runs then. 
+
+
+## part (c)
+
+In how many seasons was the Cubs total attendance (i.e. the variable
+Attendance) over 3 million?
+
+```{r}
+nrow(na.omit(cubs[cubs$Attendance > 3000000,]))
+```
+
+
+# Question 3
+
+https://colab.research.google.com/drive/1ZXO9cPbcp8yyQ9iwl8FMzuVR3vxCiovA?usp=sharing
+
+
+# Question 4
+
+57.3% of Chicago’s population is Black or Latino. 71% of San
+Antonio’s population is Black or Latino. Chicago has given out 301,000 vaccines and 43.4% of these were to Black or Latino residents. San Antonio has given out 266,000 vaccines and 57.2% of these were to Black or Latino residents. Which of the cities had a more equitable distribution of vaccines? (Note: This is a wildly open ended question.)
+
+San Antonio seems to have had a slightly more equitable distribution of vaccines as the percentage of vaccines given to Black or Latino residents is closer to the actual proportion of the population (about 13.8%) versus Chicago had a slightly larger gap between the number of vaccines given to Black or Latino residents and the actual proportion of the population (about 13.9%). However, the fact that San Antonio has given out less vaccines over all may play a role in this and so it is difficult to say.
+
+
