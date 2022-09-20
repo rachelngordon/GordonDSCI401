@@ -191,8 +191,8 @@ delays <- flights[flights$arr_delay > 0,]
 
 # create histogram by month
 library(ggplot2)
-ggplot(delays, aes(x=arr_delay, fill=factor(month), color=factor(month))) +
-geom_histogram(position="identity")
+ggplot(delays, aes(x=arr_delay)) +
+geom_histogram(position="identity") + facet_wrap(~ month) + ggtitle("Delay Times Grouped by Month")
 ```
 
 
